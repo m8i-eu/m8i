@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>M8i dot EU</title>
+<style>
+  body {
+    margin: 0;
+    background: black;
+    overflow: hidden;
+    font-family: monospace;
+  }
+
+  #welcome {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  color: white;
+  font-size: 32px; /* adjust size ()*/
+  font-family: monospace;
+  text-align: center;
+  }
+
+  canvas {
+    display: block;
+  }
+</style>
+</head>
+<body>
+
+<div id="welcome"> 01101000 01100101 01101100 01101100 01101111 00100000 01100001 01101110 01100100 00100000 01100111 01101111 01101111 01100100 01100010 01111001 01100101 00100001 </div>
+<canvas id="binaryRain"></canvas>
+
+<script>
+const canvas = document.getElementById('binaryRain');
+const ctx = canvas.getContext('2d');
+
+function initCanvas() {
+  canvas.width = window.innerWidth;
+  canvas.height = window.innerHeight;
+}
+initCanvas();
+
+window.addEventListener('resize', () => {
+  initCanvas();
+  initColumns();
+});
+
+const fontSize = 20;
+let columns = Math.floor(canvas.width / fontSize);
+let rainColumns = [];
+
+function initColumns() {
+  columns = Math.floor(canvas.width / fontSize);
+  rainColumns = [];
+  for (let i = 0; i < columns; i++) {
+    rainColumns[i] = {
+      drops: [],
+      speed: 0.3 + Math.random() * 0.3,
+      columnChar: Math.random() > 0.5 ? '1' : '0'
+    };
+  }
+}
+initColumns();
+
+function draw() {
+  // Fade background slightly for trails
+  ctx.fillStyle = 'rgba(0, 0, 0, 0.08)';
+  ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+  ctx.fillStyle = '#FFFFFF';
+  ctx.font = fontSize + "px monospace";
+
+  for (let i = 0; i < rainColumns.length; i++) {
+    const col = rainColumns[i];
+
+    // appearance probability for falling columns
+    if (Math.random() < 0.0008) { // 0.08% chance per frame
+      col.drops.push(0);
+    }
+
+    // draw and update drops
+    for (let j = 0; j < col.drops.length; j++) {
+      ctx.fillText(col.columnChar, i * fontSize, col.drops[j]);
+      col.drops[j] += col.speed * fontSize;
+
+      if (col.drops[j] > canvas.height) {
+        col.drops.splice(j, 1);
+        j--;
+      }
+    }
+
+    // Occasionally change column character
+    if (Math.random() > 0.995) {
+      col.columnChar = Math.random() > 0.5 ? '1' : '0';
+    }
+  }
+}
+      // frame
+setInterval(draw, 88);
+</script>
+</body>
+</html>
